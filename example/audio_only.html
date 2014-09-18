@@ -6,9 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
-        <video id='video' height='480' width='640'></video>
+        <canvas id='canvas'></canvas>
         <button onClick="captureScreenshot()">Capture Screenshot</button>
         <button onClick="toggleMicPlayback()">Toggle Mic Playback</button>
+
         <script src='./js/bundle.js'></script>
         <script>
           var rtsee = new RTSee(document.getElementById('video'), {video: false});
