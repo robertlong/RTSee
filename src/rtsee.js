@@ -1,17 +1,24 @@
 var _ = require('lodash');
 
 navigator.getUserMedia = navigator.getUserMedia ||
-                         navigator.webkitGetUserMedia ||
-                         navigator.mozGetUserMedia ||
-                         navigator.msGetUserMedia;
+                   navigator.webkitGetUserMedia ||
+                   navigator.mozGetUserMedia ||
+                   navigator.msGetUserMedia;
 
-function RTSee (el, opts) {
-  this.el = el;
+var AudioContext = window.webkitAudioContext || window.AudioContext;
+
+function RTSee (videoEl, opts) {
+  this.videoEl = videoEl;
 
   this.opts = _.extend({
     video: true,
-    audio: true
-  }, opts);  
+    audio: true,
+    micPlaybackMuted: false
+  }, opts);
+
+  this.videoEl.muted = this.opts.micPlaybackMuted;
+
+  this.audioContext = new AudioContext();
 
   navigator.getUserMedia({video: this.opts.video, audio: this.opts.audio}, 
     this._onMediaSuccess.bind(this), 
@@ -22,8 +29,8 @@ _.extend(RTSee.prototype, {
   
   _onMediaSuccess: function (mediaStream) {
     this.stream = mediaStream;
-    this.el.src = window.URL.createObjectURL(this.stream);
-    this.el.play();
+    this.videoEl.src = window.URL.createObjectURL(this.stream);
+    this.videoEl.play();
   },
 
   _onMediaError: function (err) {
@@ -34,10 +41,10 @@ _.extend(RTSee.prototype, {
     var canvas = document.createElement('canvas');
 
     var context = canvas.getContext('2d');
-    canvas.width = this.el.width;
-    canvas.height = this.el.height;
+    canvas.width = this.videoEl.width;
+    canvas.height = this.videoEl.height;
 
-    context.drawImage(this.el, 0, 0, canvas.width, canvas.height);
+    context.drawImage(this.videoEl, 0, 0, canvas.width, canvas.height);
     
     var dataURL = canvas.toDataURL('image/png');
     
@@ -45,6 +52,30 @@ _.extend(RTSee.prototype, {
     img.src = dataURL;
 
     return img;
+  },
+
+  toggleMicPlayback: function () {
+    this.videoEl.muted = !this.videoEl.muted;
+  },
+
+  audioEffect: function () {
+    var microphone = this.audioContext.createMediaStreamSource(this.stream);
+    var analyser = this.audioContext.createAnalyser();
+    microphone.connect(analyser);
+
+    function process(){
+        setInterval(function(){
+            FFTData = new Float32Array(analyser.frequencyBinCount);
+            analyser.getFloatFrequencyData(FFTData);
+            
+            if (FFTData[0] > -90) {
+              console.log(FFTData[0]);
+            }
+            
+        },10);
+    }
+
+    process();
   }
 
 });

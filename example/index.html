@@ -8,12 +8,17 @@
     <body>
         <video id='video' height='480' width='640'></video>
         <button onClick="captureScreenshot()">Capture Screenshot</button>
+        <button onClick="toggleMicPlayback()">Toggle Mic Playback</button>
         <script src='./js/bundle.js'></script>
         <script>
-          var rtsee = new RTSee(document.getElementById('video'));
+          var rtsee = new RTSee(document.getElementById('video'), {video: false});
 
           function captureScreenshot () {
             document.body.appendChild(rtsee.captureScreenshot());
+          }
+
+          function toggleMicPlayback () {
+            rtsee.toggleMicPlayback();
           } 
         </script>
     </body>
