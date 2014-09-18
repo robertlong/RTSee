@@ -1,0 +1,1 @@
+window.RTSee = require('./src/rtsee');
