@@ -2,17 +2,17 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title></title>
+        <title>RTSee Audio Only Example</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
-        <canvas id='canvas'></canvas>
-        <button onClick="captureScreenshot()">Capture Screenshot</button>
-        <button onClick="toggleMicPlayback()">Toggle Mic Playback</button>
-
+        <h1>RTSee Audio Only Example</h1>
+        <div>
+            <button onClick="toggleMicPlayback()">Toggle Mic Playback</button>
+        </div>
         <script src='./js/bundle.js'></script>
         <script>
-          var rtsee = new RTSee(document.getElementById('video'), {video: false});
+          var rtsee = new RTSee({video: false});
 
           function captureScreenshot () {
             document.body.appendChild(rtsee.captureScreenshot());

@@ -9,8 +9,9 @@ navigator.getUserMedia = navigator.getUserMedia ||
 // Keeps the canvas from rendering at unessessary speeds
 var FRAMERATE_CAP = 30;// fps
 
-function RTSee (canvasEl, opts) {
+function RTSee (opts) {
   this.opts = extend({
+    canvasEl: null,
     video: true,
     audio: true,
     width: 640,
@@ -19,17 +20,8 @@ function RTSee (canvasEl, opts) {
     filter: 'default',
     onError: function () {}
   }, opts);
-
-  this.canvasEl = canvasEl;
+  
   this.videoEl = document.createElement('video');
-  this.backEl = document.createElement('canvas');
-
-  this.backEl.width = this.canvasEl.width = this.opts.width;
-  this.backEl.height = this.canvasEl.height = this.opts.height;
-
-  this.canvasCtx = canvasEl.getContext('2d');
-  this.backCtx = this.backEl.getContext('2d');
-
   this.videoEl.muted = this.opts.micPlaybackMuted;
 
   navigator.getUserMedia(
@@ -48,7 +40,9 @@ extend(RTSee.prototype, {
     this.videoEl.src = window.URL.createObjectURL(mediaStream);
     this.videoEl.play();
 
-    this.videoEl.addEventListener('playing', this._onPlaying.bind(this), false);
+    if (this.opts.video && this.opts.canvasEl) {
+      this.videoEl.addEventListener('playing', this._setupVideo.bind(this), false);
+    }
   },
 
   /**
@@ -64,21 +58,27 @@ extend(RTSee.prototype, {
    * Once the video has begun playing, render the video to the canvas at
    * FRAMERATE_CAP fps.
    */
-  _onPlaying: function () {
-    var video = this.videoEl;
-    var canvas = this.canvasEl;
-    var ctx = this.canvasCtx;
-    var backCtx = this.backCtx;
-    var back = this.backEl;
-    var cw = this.opts.width;
-    var ch = this.opts.height;
+  _setupVideo: function () {
+    var canvasEl = this.opts.canvasEl;
+    var backEl = document.createElement('canvas');
+    var videoEl = this.videoEl;
+
+    var width = this.opts.width;
+    var height = this.opts.height;
+
+    var canvasCtx = canvasEl.getContext('2d');
+    var backCtx = backEl.getContext('2d');
+
     var renderCanvas = this._renderCanvas.bind(this);
+    
+    backEl.width = canvasEl.width = width;
+    backEl.height = canvasEl.height = height;
 
     var draw = function () {
-        setTimeout(function() {
-            requestAnimationFrame(draw);
-            renderCanvas(video, ctx, backCtx, cw, ch, this.opts.filter); 
-        }.bind(this), 1000 / FRAMERATE_CAP);
+      setTimeout(function() {
+          requestAnimationFrame(draw);
+          renderCanvas(videoEl, canvasCtx, backCtx, width, height, this.opts.filter); 
+      }.bind(this), 1000 / FRAMERATE_CAP);
     }.bind(this);
 
     draw();
@@ -177,13 +177,16 @@ extend(RTSee.prototype, {
 
   // Returns the image captured from the provided canvas element.
   captureScreenshot: function () {
-    var canvas = this.canvasEl;
-    var dataURL = canvas.toDataURL('image/png');
-    
-    var img = new Image();
-    img.src = dataURL;
+    var canvas = this.opts.canvasEl;
 
-    return img;
+    if (this.opts.video && canvas) {
+      var dataURL = canvas.toDataURL('image/png');
+      
+      var img = new Image();
+      img.src = dataURL;
+
+      return img;  
+    }
   },
 
   /**
