@@ -27,7 +27,7 @@
         </div>
         <script src='./js/bundle.js'></script>
         <script>
-          var rtsee = new RTSee({canvasEl: document.getElementById('canvas') });
+          var rtsee = new RTSee({canvasEl: document.getElementById('canvas'), onError: onError});
 
           function captureScreenshot () {
             document.body.appendChild(rtsee.captureScreenshot());
@@ -39,6 +39,10 @@
 
           function onChangeFilter () {
             rtsee.opts.filter = document.getElementById('filter').value;
+          }
+
+          function onError () {
+            alert('Error getting Webcam or Microphone. Make sure allow access to your Webcam and Microphone');
           }
         </script>
     </body>

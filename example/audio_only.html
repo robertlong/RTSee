@@ -12,7 +12,7 @@
         </div>
         <script src='./js/bundle.js'></script>
         <script>
-          var rtsee = new RTSee({video: false});
+          var rtsee = new RTSee({video: false, onError: onError});
 
           function captureScreenshot () {
             document.body.appendChild(rtsee.captureScreenshot());
@@ -20,6 +20,10 @@
 
           function toggleMicPlayback () {
             rtsee.toggleMicPlayback();
+          }
+
+          function onError () {
+            alert('Error getting Microphone. Make sure allow access to your Microphone');
           } 
         </script>
     </body>
