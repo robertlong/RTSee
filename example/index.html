@@ -2,22 +2,32 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title></title>
+        <title>RTSee Example</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            canvas {
+                width: 640px;
+                height: 480px;
+                background-color: #ccc;
+            }
+        </style>
     </head>
     <body>
+        <h1>RTSee Example</h1>
         <canvas id='canvas'></canvas>
-        <select id='filter' onChange="onChangeFilter()">
-          <option value="default">No Filter</option>
-          <option value="greyscale">Greyscale</option>
-          <option value="sepia">Sepia</option>
-          <option value="invert">Invert Color</option>
-        </select>
-        <button onClick="captureScreenshot()">Capture Screenshot</button>
-        <button onClick="toggleMicPlayback()">Toggle Mic Playback</button>
+        <div>
+            <select id='filter' onChange="onChangeFilter()">
+              <option value="default">No Filter</option>
+              <option value="greyscale">Greyscale</option>
+              <option value="sepia">Sepia</option>
+              <option value="invert">Invert Color</option>
+            </select>
+            <button onClick="captureScreenshot()">Capture Screenshot</button>
+            <button onClick="toggleMicPlayback()">Toggle Mic Playback</button>
+        </div>
         <script src='./js/bundle.js'></script>
         <script>
-          var rtsee = new RTSee(document.getElementById('canvas'));
+          var rtsee = new RTSee({canvasEl: document.getElementById('canvas') });
 
           function captureScreenshot () {
             document.body.appendChild(rtsee.captureScreenshot());
